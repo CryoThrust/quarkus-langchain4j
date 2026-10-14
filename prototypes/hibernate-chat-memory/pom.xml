@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>io.quarkiverse.langchain4j.prototype</groupId>
+  <artifactId>hibernate-chat-memory</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <properties>
+    <maven.compiler.release>17</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <quarkus.version>3.40.0</quarkus.version>
+    <langchain4j.version>1.21.0</langchain4j.version>
+  </properties>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>io.quarkus</groupId><artifactId>quarkus-bom</artifactId>
+        <version>${quarkus.version}</version><type>pom</type><scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  <dependencies>
+    <dependency><groupId>io.quarkus</groupId><artifactId>quarkus-hibernate-orm</artifactId></dependency>
+    <dependency><groupId>io.quarkus</groupId><artifactId>quarkus-jdbc-h2</artifactId></dependency>
+    <dependency>
+      <groupId>dev.langchain4j</groupId><artifactId>langchain4j-core</artifactId><version>${langchain4j.version}</version>
+    </dependency>
+    <dependency><groupId>io.quarkus</groupId><artifactId>quarkus-junit</artifactId><scope>test</scope></dependency>
+    <!-- Plain Hibernate bootstrap tests need the bytecode provider that Quarkus replaces at build time. -->
+    <dependency><groupId>net.bytebuddy</groupId><artifactId>byte-buddy</artifactId><scope>test</scope></dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>io.quarkus</groupId><artifactId>quarkus-maven-plugin</artifactId><version>${quarkus.version}</version>
+        <extensions>true</extensions>
+        <executions><execution><goals><goal>build</goal><goal>generate-code</goal><goal>generate-code-tests</goal></goals></execution></executions>
+      </plugin>
+      <plugin><artifactId>maven-compiler-plugin</artifactId><version>3.14.0</version></plugin>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId><version>3.5.4</version>
+        <configuration>
+          <systemPropertyVariables><java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager></systemPropertyVariables>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>net.revelc.code.formatter</groupId>
+        <artifactId>formatter-maven-plugin</artifactId>
+        <version>2.29.0</version>
+        <dependencies>
+          <dependency>
+            <groupId>io.quarkus</groupId><artifactId>quarkus-ide-config</artifactId><version>3.0.0.Final</version>
+          </dependency>
+        </dependencies>
+        <configuration><configFile>eclipse-format.xml</configFile><lineEnding>LF</lineEnding></configuration>
+        <executions><execution><phase>verify</phase><goals><goal>validate</goal></goals></execution></executions>
+      </plugin>
+      <plugin>
+        <groupId>net.revelc.code</groupId><artifactId>impsort-maven-plugin</artifactId><version>1.13.0</version>
+        <configuration>
+          <groups>java.,javax.,jakarta.,org.,com.</groups><staticGroups>*</staticGroups><removeUnused>true</removeUnused>
+        </configuration>
+        <executions><execution><phase>verify</phase><goals><goal>check</goal></goals></execution></executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
